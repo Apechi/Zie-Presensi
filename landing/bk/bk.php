@@ -1,7 +1,7 @@
 <?php
 require "../../functions/functions.php"; // !memanggil file functions.php
 
-checkSession("login_operator siswa"); // !menjalankan fungi untuk mengecek session
+checkSession("login_bk"); // !menjalankan fungi untuk mengecek session
 
 $dataUser = ""; // !membuat variabel untuk menyimpan data user
 
@@ -10,7 +10,6 @@ if (getDataFromCookie() !== false) { // !mengecek apakah function getDataFromCoo
 } else { // !ketika function getDataFromCookie mengembalikan false
     $dataUser = getDataFromSession();
 }
-
 
 ?>
 
@@ -27,7 +26,7 @@ if (getDataFromCookie() !== false) { // !mengecek apakah function getDataFromCoo
     <script src="https://kit.fontawesome.com/64f5e4ae10.js" crossorigin="anonymous"></script>
     <script src="../../js/jquery-3.6.3.min.js"></script>
     <script src="../../js/upload.js"></script>
-    <title>halaman operator siswa</title>
+    <title>halaman wali kelas</title>
 </head>
 
 <body>
@@ -58,13 +57,7 @@ if (getDataFromCookie() !== false) { // !mengecek apakah function getDataFromCoo
                 <a href="absensi.php">Absensi</a>
             </div>
             <div class="menu">
-                <a href="mapel.php">Jadwal Pelajaran</a>
-            </div>
-            <div class="menu">
-                <a href="absensi/data_absensi.php">Data Absensi</a>
-            </div>
-            <div class="menu">
-                <a href="agenda/agenda.php">Agenda</a>
+                <a href="konsultasi.php">Konsultasi Siswa</a>
             </div>
         </div>
         <div class="footer-sidebar">
@@ -99,12 +92,13 @@ if (getDataFromCookie() !== false) { // !mengecek apakah function getDataFromCoo
         if (uploadImage($dataUser["nama"], "../../image/$dataUser[foto]", "../../image/") > 0) {
             echo "<script>
         alert ('Foto profile berhasil diedit!');
-        document.location.href = './operator.siswa.php';
+        document.location.href = './bk.php';
         </script>";
         }
     }
 
     ?>
+
 </body>
 
 </html>
