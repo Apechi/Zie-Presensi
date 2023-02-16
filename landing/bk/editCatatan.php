@@ -14,6 +14,10 @@ if (getDataFromCookie() !== false) { // !mengecek apakah function getDataFromCoo
 
 $id = $_GET["id"];
 $dataCatatan = getDataKonsultasi("SELECT * FROM konsultasi WHERE id = $id");
+$dataNIS = getNIS();
+$kelas = getKelas();
+$jenisKonsul = array("karir", "belajar", "kasus");
+$status = array("diproses", "selesai");
 
 ?>
 
@@ -85,62 +89,91 @@ $dataCatatan = getDataKonsultasi("SELECT * FROM konsultasi WHERE id = $id");
         </div>
     </div>
 
-
     <div class="container">
         <div class="wrapper">
-            <h1>Detail Catatan</h1>
+            <h1>Edit Catatan</h1>
             <div class="edit-field">
-                <a href="editCatatan.php?id=<?= $id ?>" class="editCatatan">Edit Catatan</a>
+                <a href="hapusCatatan.php?id=<?= $id ?>&gambar=<?= $dataCatatan[0]["dokumentasi"] ?>" class="editCatatan hapus" onclick="return confirm('Apakah anda yakin ingin menghapusnya?')">Hapus Catatan</a>
             </div>
             <form action="" method="POST" enctype="multipart/form-data" class="form-tambah">
+                <input type="hidden" name="gambarLama" value="<?= $dataCatatan[0]["dokumentasi"] ?>">
                 <label for="tanggal" class="disable">
                     <span>Tanggal Pembuatan Catatan</span>
                     <input type="text" name="tanggal" id="tanggal" autocomplete="off" value="<?= $dataCatatan[0]["tanggal"] ?>">
                 </label>
-                <label for="nis" class="disable">
+                <label for="nis">
                     <span>NIS</span>
-                    <input type="text" name="nis" id="nis" autocomplete="off" value="<?= $dataCatatan[0]["nis_siswa"] ?>">
+                    <select name="nis" id="nis">
+                        <?php foreach ($dataNIS as $nis) : ?>
+                            <option value="<?= $nis["nis"] ?>" <?php if ($nis["nis"] == $dataCatatan[0]["nis_siswa"]) {
+                                                                    echo "selected";
+                                                                } ?>><?= $nis["nis"] ?></option>
+                        <?php endforeach; ?>
+                    </select>
                 </label>
-                <label for="nama" class="disable">
+                <label for="nama">
                     <span>Nama</span>
                     <input type="text" name="nama" id="nama" autocomplete="off" value="<?= ucwords($dataCatatan[0]["nama_siswa"]) ?>">
                 </label>
-                <label for="kelas" class="disable">
+                <label for="kelas">
                     <span>Kelas</span>
-                    <input type="text" name="kelas" id="kelas" autocomplete="off" value="<?= strtoupper($dataCatatan[0]["kelas_siswa"]) ?>">
+                    <select name="kelas" id="kelas">
+                        <?php foreach ($kelas as $kls) : ?>
+                            <option value="<?= $kls["kode"] ?>" <?php if ($kls["kode"] == $dataCatatan[0]["kelas_siswa"]) {
+                                                                    echo "selected";
+                                                                } ?>><?= strtoupper($kls["kode"]) ?></option>
+                        <?php endforeach; ?>
+                    </select>
                 </label>
-                <label for="waliKelas" class="disable">
+                <label for="waliKelas">
                     <span>Wali Kelas</span>
                     <input type="text" name="waliKelas" id="waliKelas" autocomplete="off" value="<?= ucwords($dataCatatan[0]["waliKelas_siswa"]) ?>">
                 </label>
-                <label for="guruBk" class="disable">
+                <label for="guruBk">
                     <span>Guru BK</span>
                     <input type="text" name="guruBk" id="guruBk" autocomplete="off" value="<?= ucwords($dataCatatan[0]["guruBK_siswa"]) ?>">
                 </label>
-                <label for="jenisKonsul" class="disable">
-                    <span>Jenis Konsultasi</span>
-                    <input type="text" name="jenisKonsul" id="jenisKonsul" autocomplete="off" value="<?= ucWords($dataCatatan[0]["jenisKonsultasi"]) ?>">
+                <label for="jenis">
+                    <span>Jenis</span>
+                    <select name="jenis" id="jenis">
+                        <?php foreach ($jenisKonsul as $jenis) : ?>
+                            <option value="<?= $jenis ?>" <?php if ($jenis == $dataCatatan[0]["jenisKonsultasi"]) {
+                                                                echo "selected";
+                                                            } ?>><?= ucwords($jenis) ?></option>
+                        <?php endforeach; ?>
+                    </select>
                 </label>
-                <label for="rangkuman" class="disable">
+                <label for="rangkuman">
                     <span>Rangkuman Konsultasi</span>
                     <textarea name="rangkuman" id="rangkuman"><?= ucfirst($dataCatatan[0]["rangkumanKonsultasi"]) ?></textarea>
                 </label>
-                <label for="penanganan" class="disable">
+                <label for="penanganan">
                     <span>Penanganan</span>
                     <input type="text" name="penanganan" id="penanganan" autocomplete="off" value="<?= ucfirst($dataCatatan[0]["penanganan"]) ?>">
                 </label>
-                <label for="status" class="disable">
+                <label for="status">
                     <span>Status</span>
-                    <input type="text" name="status" id="status" autocomplete="off" value="<?= ucwords($dataCatatan[0]["status"]) ?>">
+                    <select name="status" id="status">
+                        <?php foreach ($status as $sts) : ?>
+                            <option value="<?= $sts ?>" <?php if ($sts == $dataCatatan[0]["status"]) {
+                                                            echo "selected";
+                                                        } ?>><?= ucwords($sts) ?></option>
+                        <?php endforeach; ?>
+                    </select>
                 </label>
-                <label class="disable">
+                <label for="dokumentasi">
                     <span>Dokumentasi</span>
                     <?php if (strlen($dataCatatan[0]["dokumentasi"]) > 0) : ?>
                         <img src="../../image/<?= $dataCatatan[0]["dokumentasi"] ?>" alt="Dokumentasi Catatan">
                     <?php else : ?>
                         <p>Tidak ada dokumentasi</p>
                     <?php endif; ?>
+                    <input type="file" name="dokumentasi" id="dokumentasi">
                 </label>
+                <div class="button-area">
+                    <a class="batal" href="detailCatatan.php?id=<?= $id ?>">Batal</a>
+                    <button name="editCatatan">Edit</button>
+                </div>
             </form>
         </div>
     </div>
@@ -156,6 +189,15 @@ $dataCatatan = getDataKonsultasi("SELECT * FROM konsultasi WHERE id = $id");
     }
 
     ?>
+
+    <?php if (isset($_POST["editCatatan"])) {
+        if (editCatatan($_POST, $id) > 0) {
+            echo "<script>
+        alert ('Catatan berhasil diedit!');
+        document.location.href = './detailCatatan.php?id=$id';
+        </script>";
+        }
+    } ?>
 
 </body>
 

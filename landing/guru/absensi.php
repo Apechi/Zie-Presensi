@@ -2,7 +2,7 @@
 require "../../functions/functions.php"; // !memanggil file functions.php
 require "../../functions/function_absensi_guru.php"; // !memanggil file function_absensi.php
 
-checkSession("login_bk", "../../login.php"); // !menjalankan fungi untuk mengecek session
+checkSession("login_guru", "../../login.php"); // !menjalankan fungi untuk mengecek session
 
 $dataUser = ""; // !membuat variabel untuk menyimpan data user
 
@@ -53,13 +53,13 @@ if (getDataFromCookie() !== false) { // !mengecek apakah function getDataFromCoo
         </div>
         <div class="body-sidebar">
             <div class="menu">
-                <a href="bk.php">Home</a>
+                <a href="guru.php">Home</a>
             </div>
             <div class="menu" id="active">
                 <a href="#">Absensi</a>
             </div>
             <div class="menu">
-                <a href="konsultasi.php">Konsultasi Siswa</a>
+                <a href="mapel.php">Jadwal Mengajar</a>
             </div>
         </div>
         <div class="footer-sidebar">

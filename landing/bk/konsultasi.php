@@ -2,7 +2,7 @@
 require "../../functions/functions.php"; // !memanggil file functions.php
 require "../../functions/function_konsultasi.php"; // !memanggil file functions.php
 
-checkSession("login_bk"); // !menjalankan fungi untuk mengecek session
+checkSession("login_bk", "../../login.php"); // !menjalankan fungi untuk mengecek session
 
 $dataUser = ""; // !membuat variabel untuk menyimpan data user
 
@@ -98,7 +98,7 @@ $dataCatatan = getDataKonsultasi("SELECT id, nama_siswa, tanggal, status FROM ko
                     <?php endfor; ?>
                 </select>
 
-                <a href="tambahCatatan.php">Tambah Catatan</a>
+                <a href="tambahCatatan.php" class="tambah">Tambah Catatan</a>
             </form>
             <div class="catatan">
                 <?php foreach ($dataCatatan as $data) : ?>

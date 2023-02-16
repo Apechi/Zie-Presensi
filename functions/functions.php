@@ -165,10 +165,12 @@ function checkUser($tables)
 }
 
 // !---------- cek session ----------!
-function checkSession($nameOfSession) // !function untuk mengecek session di halaman landing page
+function checkSession($nameOfSession, $path) // !function untuk mengecek session di halaman landing page
 {
+
   if (!isset($_SESSION[$nameOfSession])) { // !mengecek ketika tidak ada session yang sesuai dengan argumen yang dikirim
-    header("Location: ../../login.php"); // !mengarahkan user ke halaman login
+
+    header("Location: " . $path); // !mengarahkan user ke halaman login
     exit;
   }
 }
@@ -357,7 +359,7 @@ function uploadImage($nama, $fotoLama, $path)
       $newName = uniqid();
       $newName = $newName . "." . $extension;
 
-      if (strlen($fotoLama)) {
+      if (strlen($fotoLama) > 0) {
         unlink($fotoLama);
       }
 
