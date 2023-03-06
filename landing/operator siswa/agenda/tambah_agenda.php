@@ -1,19 +1,24 @@
 <?php
-require "../../../functions/functions.php"; // !memanggil file functions.php
-require "../../../functions/function_agenda.php"; // !memanggil file functions.php
+require "../../../koneksi.php";
+require "../../../functions/login_function.php";
+require "../../../functions/agenda_siswa_function.php";
+require "../../../functions/upload_image_function.php";
 
-checkSession("login_operator siswa", "../../../login.php"); // !menjalankan fungi untuk mengecek session
-
-$dataUser = ""; // !membuat variabel untuk menyimpan data user
-
-if (getDataFromCookie() !== false) { // !mengecek apakah function getDataFromCookie tidak sama dengan false
-    $dataUser = getDataFromCookie(); // !menyimpan data yang dikembalikan ke dalam variabel dataUser
-} else { // !ketika function getDataFromCookie mengembalikan false
-    $dataUser = getDataFromSession();
+// cek user apakah sudah login atau belum
+if (!isLoggedIn()) {
+    Header("Location: ../../../login.php");
+    exit();
 }
 
-$kodeKelas = $dataUser["kode"];
+// cek user apakah memiliki role yang benar
+if (!hasRole("operator siswa")) {
+    Header("Location: ../../errorLevel.php");
+    exit();
+}
 
+include("../../../data/data_siswa.php");
+
+$dataGuru = getDataGuru($conn);
 ?>
 
 <!DOCTYPE html>
@@ -29,27 +34,23 @@ $kodeKelas = $dataUser["kode"];
     <script src="https://kit.fontawesome.com/64f5e4ae10.js" crossorigin="anonymous"></script>
     <script src="../../../js/jquery-3.6.3.min.js"></script>
     <script src="../../../js/upload.js"></script>
-    <title>halaman operator siswa</title>
+    <title>halaman siswa</title>
 </head>
 
 <body>
     <div class="sidebar">
         <div class="head-sidebar">
             <div class="image-profile">
-                <img <?php if (strlen($dataUser["foto"]) > 0) {
-                            echo "src='../../../image/$dataUser[foto]'";
-                        } else {
-                            echo "src='../../../image/profile.jpg'";
-                        } ?> alt="image-profile">
+                <img src="../../../image/<?= $dataUser["foto"] ?>" alt="image-profile">
                 <div class="text-foto">
                     <span>Edit Foto</span>
                 </div>
             </div>
             <div class="name-profile">
-                <h2><?= ucwords($dataUser["nama"]) ?></h2>
+                <h2><?= $dataUser["username"] ?></h2>
             </div>
             <div class="class-profile">
-                <p><?= ucwords($dataUser["level"]) ?></p>
+                <p><?= ucwords($dataUser["role"]) ?></p>
             </div>
         </div>
         <div class="body-sidebar">
@@ -63,16 +64,54 @@ $kodeKelas = $dataUser["kode"];
                 <a href="../mapel.php">Jadwal Pelajaran</a>
             </div>
             <div class="menu">
-                <a href="data_absensi.php">Data Absensi</a>
+                <a href="../absensi/data_absensi.php">Isi Absensi</a>
             </div>
             <div class="menu">
-                <a href="agenda.php">Agenda</a>
+                <a href="agenda.php">Isi Agenda</a>
+            </div>
+            <div class="menu">
+                <a href="../editData/editData.php">Edit Data</a>
             </div>
         </div>
         <div class="footer-sidebar">
             <div class="menu-logout">
-                <a href="../../../logout.php?id=<?= $dataUser["id"] ?>">Keluar</a>
+                <a href="../../../logout.php?id=<?= $dataUser["id_operator"] ?>">Keluar</a>
             </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="wrapper tambah">
+            <h1>Tambah Agenda Kelas</h1>
+            <form action="" method="POST">
+                <label for="guru" class="field">
+                    <span class="label">Nama Guru</span>
+                    <select name="guru" id="guru">
+                        <?php foreach ($dataGuru as $data) : ?>
+                            <option value="<?= $data["id"] ?>"><?= ucwords($data["nama"]) ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </label>
+                <label for="materi" class="field">
+                    <span class="label">Materi</span>
+                    <input type="text" name="materi" id="materi">
+                </label>
+                <label for="jumlahMapel" class="field">
+                    <span class="label">Jumlah Mapel</span>
+                    <input type="number" name="jumlahMapel" id="jumlahMapel">
+                </label>
+                <label for="jp" class="field">
+                    <span class="label">Jumlah Jam Pelajaran</span>
+                    <input type="number" name="jp" id="jp">
+                </label>
+                <label for="keterangan" class="field">
+                    <span class="label">Keterangan</span>
+                    <textarea name="keterangan" id="keterangan"></textarea>
+                </label>
+                <div class="button-area">
+                    <button type="submit" name="tambah-agenda">Tambah</button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -90,43 +129,20 @@ $kodeKelas = $dataUser["kode"];
         </div>
     </div>
 
-    <div class="container">
-        <div class="wrapper">
-            <h1>Tambah Agenda Kelas <?= $dataUser["kode"] ?></h1>
-            <form action="" method="POST">
-                <label for="guru" class="field">
-                    <span class="label">Nama Guru</span>
-                    <span class="two-point">:</span>
-                    <input type="text" name="nama_guru" id="guru" autocomplete="off">
-                </label>
-                <label for="materi" class="field">
-                    <span class="label">Materi</span>
-                    <span class="two-point">:</span>
-                    <input type="text" name="materi" id="materi" autocomplete="off">
-                </label>
-                <label for="jam" class="field">
-                    <span class="label">Jam</span>
-                    <span class="two-point">:</span>
-                    <input type="text" name="jam" id="jam" autocomplete="off">
-                </label>
-                <label for="keterangan">
-                    <div class="keterangan-field">
-                        <span class="label">Keterangan</span>
-                        <span class="two-point">:</span>
-                    </div>
-                    <textarea name="keterangan" id="keterangan"></textarea>
-                </label>
-                <div class="button-area">
-                    <button type="submit" name="tambah-agenda">Tambah</button>
-                </div>
-            </form>
-        </div>
-    </div>
+    <?php if (isset($_FILES["image"])) {
+        if (uploadImage($conn, $dataUser["id"], "../../../image/", "../../../image/{$dataUser["foto"]}") > 0) {
+            echo "<script>
+        alert('Foto profile berhasil diganti!')
+        document.location.href = '../operator_siswa.php'
+      </script>";
+        }
+    } ?>
+
 
 
     <?php
     if (isset($_POST["tambah-agenda"])) {
-        if (tambahAgenda($kodeKelas) > 0) {
+        if (tambahAgenda($conn, $_POST, $dataUser["id"]) > 0) {
             echo "<script>
                 alert('Data berhasil ditambahkan');
                 document.location.href = 'agenda.php';
@@ -135,17 +151,6 @@ $kodeKelas = $dataUser["kode"];
     }
     ?>
 
-    <?php
-    if (isset($_FILES["image"])) {
-        if (uploadImage($dataUser["nama"], "../../../image/$dataUser[foto]", "../../../image/") > 0) {
-            echo "<script>
-        alert ('Foto profile berhasil diedit!');
-        document.location.href = './agenda.php';
-        </script>";
-        }
-    }
-
-    ?>
 
 </body>
 

@@ -1,15 +1,21 @@
 <?php
-require "../../functions/functions.php"; // !memanggil file functions.php
+require "../../koneksi.php";
+require "../../functions/login_function.php";
+require "../../functions/upload_image_function.php";
 
-checkSession("login_bk", "../../login.php"); // !menjalankan fungi untuk mengecek session
-
-$dataUser = ""; // !membuat variabel untuk menyimpan data user
-
-if (getDataFromCookie() !== false) { // !mengecek apakah function getDataFromCookie tidak sama dengan false
-    $dataUser = getDataFromCookie(); // !menyimpan data yang dikembalikan ke dalam variabel dataUser
-} else { // !ketika function getDataFromCookie mengembalikan false
-    $dataUser = getDataFromSession();
+// cek user apakah sudah login atau belum
+if (!isLoggedIn()) {
+    Header("Location: ../../login.php");
+    exit();
 }
+
+// cek user apakah memiliki role yang benar
+if (!hasRole("bk")) {
+    Header("Location: ../errorLevel.php");
+    exit();
+}
+
+include("../../data/data_guru.php");
 
 ?>
 
@@ -33,20 +39,16 @@ if (getDataFromCookie() !== false) { // !mengecek apakah function getDataFromCoo
     <div class="sidebar">
         <div class="head-sidebar">
             <div class="image-profile">
-                <img <?php if (strlen($dataUser["foto"]) > 0) {
-                            echo "src='../../image/$dataUser[foto]'";
-                        } else {
-                            echo "src='../../image/profile.jpg'";
-                        } ?> alt="image-profile">
+                <img src="../../image/<?= $dataUser["foto"] ?>" alt="image-profile">
                 <div class="text-foto">
                     <span>Edit Foto</span>
                 </div>
             </div>
             <div class="name-profile">
-                <h2><?= ucwords($dataUser["nama"]) ?></h2>
+                <h2><?= $dataUser["username"] ?></h2>
             </div>
             <div class="class-profile">
-                <p><?= ucwords($dataUser["level"]) ?></p>
+                <p><?= ucwords($dataUser["role"]) ?></p>
             </div>
         </div>
         <div class="body-sidebar">
@@ -57,14 +59,23 @@ if (getDataFromCookie() !== false) { // !mengecek apakah function getDataFromCoo
                 <a href="absensi.php">Absensi</a>
             </div>
             <div class="menu">
-                <a href="konsultasi.php">Konsultasi Siswa</a>
+                <a href="catatan/konsultasi.php">Konsultasi Siswa</a>
+            </div>
+            <div class="menu">
+                <a href="editData/editData.php?id=<?= $dataUser["id"] ?>">Edit Data</a>
             </div>
         </div>
         <div class="footer-sidebar">
             <div class="menu-logout">
-                <a href="../../logout.php?id=<?= $dataUser["id"] ?>">Keluar</a>
+                <a href="../../logout.php?id=<?= $dataUser["id_operator"] ?>">Keluar</a>
             </div>
         </div>
+    </div>
+
+    <div class="container">
+        <img src="../../image/logoSmakzie.jpg" alt="logo smakzie" class="logo-image">
+        <h1>Selamat Datang di Zie Presensi</h1>
+        <p>Jangan lupa untuk mengisi absen setiap pagi</p>
     </div>
 
     <div class="wrapper-popup">
@@ -80,24 +91,16 @@ if (getDataFromCookie() !== false) { // !mengecek apakah function getDataFromCoo
         </div>
     </div>
 
-
-    <div class="container">
-        <img src="../../image/logoSmakzie.jpg" alt="logo smakzie" class="logo-image">
-        <h1>Selamat Datang di Zie Presensi</h1>
-        <p>Jangan lupa untuk mengisi absen setiap pagi</p>
-    </div>
-
-    <?php
-    if (isset($_FILES["image"])) {
-        if (uploadImage($dataUser["nama"], "../../image/$dataUser[foto]", "../../image/") > 0) {
+    <?php if (isset($_FILES["image"])) {
+        if (uploadImage($conn, $dataUser["id"], "../../image/", "../../image/{$dataUser["foto"]}") > 0) {
             echo "<script>
-        alert ('Foto profile berhasil diedit!');
-        document.location.href = './bk.php';
-        </script>";
+        alert('Foto profile berhasil diganti!')
+        document.location.href = 'bk.php'
+      </script>";
         }
-    }
+    } ?>
 
-    ?>
+
 
 </body>
 

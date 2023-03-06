@@ -1,6 +1,7 @@
 <?php
 require "../../koneksi.php";
 require "../../functions/login_function.php";
+require "../../functions/upload_image_function.php";
 
 // cek user apakah sudah login atau belum
 if (!isLoggedIn()) {
@@ -14,13 +15,7 @@ if (!hasRole("operator siswa")) {
     exit();
 }
 
-$dataUser = "";
-
-if (isset($_COOKIE["key"])) {
-    $dataUser = getDataFromCookie($conn);
-} else {
-    $dataUser = $_SESSION["user"];
-}
+include("../../data/data_siswa.php")
 
 ?>
 
@@ -33,7 +28,7 @@ if (isset($_COOKIE["key"])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../../css/base.css">
     <link rel="stylesheet" href="../../css/sidebar.css">
-    <link rel="stylesheet" href="../../css/siswa.css">
+    <link rel="stylesheet" href="../../css/mapel.css">
     <script src="https://kit.fontawesome.com/64f5e4ae10.js" crossorigin="anonymous"></script>
     <script src="../../js/jquery-3.6.3.min.js"></script>
     <script src="../../js/upload.js"></script>
@@ -44,13 +39,13 @@ if (isset($_COOKIE["key"])) {
     <div class="sidebar">
         <div class="head-sidebar">
             <div class="image-profile">
-                <img src="../../image/profile.jpg" alt="image-profile">
+                <img src="../../image/<?= $dataUser["foto"] ?>" alt="image-profile">
                 <div class="text-foto">
                     <span>Edit Foto</span>
                 </div>
             </div>
             <div class="name-profile">
-                <h2><?= ucwords($dataUser["username"]) ?></h2>
+                <h2><?= $dataUser["username"] ?></h2>
             </div>
             <div class="class-profile">
                 <p><?= ucwords($dataUser["role"]) ?></p>
@@ -67,10 +62,13 @@ if (isset($_COOKIE["key"])) {
                 <a href="#">Jadwal Pelajaran</a>
             </div>
             <div class="menu">
-                <a href="absensi/data_absensi.php">Data Absensi</a>
+                <a href="absensi/data_absensi.php">Isi Absensi</a>
             </div>
             <div class="menu">
                 <a href="agenda/agenda.php">Isi Agenda</a>
+            </div>
+            <div class="menu">
+                <a href="editData/editData.php">Edit Data</a>
             </div>
         </div>
         <div class="footer-sidebar">
@@ -82,12 +80,41 @@ if (isset($_COOKIE["key"])) {
 
 
     <div class="container">
-        <div class="wrapper">
+        <div class="wrapper mapel">
+            <h1>Jadwal Pelajaran</h1>
 
+
+            <canvas id="canvas"></canvas>
         </div>
     </div>
 
 
+    <div class="wrapper-popup">
+        <div class="popup">
+            <form action="" method="POST" enctype="multipart/form-data">
+                <label for="image">
+                    <i class="fa-solid fa-upload"></i>
+                    <span>Upload Image</span>
+                </label>
+                <input type="file" name="image" id="image" onchange="this.form.submit()">
+            </form>
+            <i class="fa-solid fa-xmark close-popup"></i>
+        </div>
+    </div>
+
+    <?php if (isset($_FILES["image"])) {
+        if (uploadImage($conn, $dataUser["id"], "../../image/", "../../image/{$dataUser["foto"]}") > 0) {
+            echo "<script>
+        alert('Foto profile berhasil diganti!')
+        document.location.href = 'operator_siswa.php'
+      </script>";
+        }
+    } ?>
+
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.3.122/pdf.min.js"></script>
+    <script src="../../js/pdfView.js"></script>
 </body>
 
 </html>

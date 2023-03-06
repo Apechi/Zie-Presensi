@@ -1,9 +1,7 @@
 <?php
 require "../../koneksi.php";
 require "../../functions/login_function.php";
-// require "../../functions/functions.php"; 
-// checkSession("login_siswa", "../../login.php"); 
-
+require "../../functions/upload_image_function.php";
 
 // cek user apakah sudah login atau belum
 if (!isLoggedIn()) {
@@ -17,13 +15,7 @@ if (!hasRole("siswa kelas")) {
   exit();
 }
 
-$dataUser = "";
-
-if (isset($_COOKIE["key"])) {
-  $dataUser = getDataFromCookie($conn);
-} else {
-  $dataUser = $_SESSION["user"];
-}
+include("../../data/data_siswa.php")
 
 ?>
 
@@ -47,13 +39,13 @@ if (isset($_COOKIE["key"])) {
   <div class="sidebar">
     <div class="head-sidebar">
       <div class="image-profile">
-        <img src="../../image/profile.jpg" alt="image-profile">
+        <img src="../../image/<?= $dataUser["foto"] ?>" alt="image-profile">
         <div class="text-foto">
           <span>Edit Foto</span>
         </div>
       </div>
       <div class="name-profile">
-        <h2><?= ucwords($dataUser["username"]) ?></h2>
+        <h2><?= $dataUser["username"] ?></h2>
       </div>
       <div class="class-profile">
         <p><?= ucwords($dataUser["role"]) ?></p>
@@ -69,12 +61,21 @@ if (isset($_COOKIE["key"])) {
       <div class="menu">
         <a href="mapel.php">Jadwal Pelajaran</a>
       </div>
+      <div class="menu">
+        <a href="editData/editData.php">Edit Data</a>
+      </div>
     </div>
     <div class="footer-sidebar">
       <div class="menu-logout">
         <a href="../../logout.php?id=<?= $dataUser["id_operator"] ?>">Keluar</a>
       </div>
     </div>
+  </div>
+
+  <div class="container">
+    <img src="../../image/logoSmakzie.jpg" alt="logo smakzie" class="logo-image">
+    <h1>Selamat Datang di Zie Presensi</h1>
+    <p>Jangan lupa untuk mengisi absen setiap pagi</p>
   </div>
 
   <div class="wrapper-popup">
@@ -90,23 +91,14 @@ if (isset($_COOKIE["key"])) {
     </div>
   </div>
 
-  <div class="container">
-    <img src="../../image/logoSmakzie.jpg" alt="logo smakzie" class="logo-image">
-    <h1>Selamat Datang di Zie Presensi</h1>
-    <p>Jangan lupa untuk mengisi absen setiap pagi</p>
-  </div>
-
-  <?php
-  if (isset($_FILES["image"])) {
-    if (uploadImage($dataUser["nama"], "../../image/$dataUser[foto]", "../../image/") > 0) {
+  <?php if (isset($_FILES["image"])) {
+    if (uploadImage($conn, $dataUser["id"], "../../image/", "../../image/{$dataUser["foto"]}") > 0) {
       echo "<script>
-        alert ('Foto profile berhasil diedit!');
-        document.location.href = './siswa.php';
-        </script>";
+        alert('Foto profile berhasil diganti!')
+        document.location.href = 'siswa.php'
+      </script>";
     }
-  }
-
-  ?>
+  } ?>
 
 </body>
 
